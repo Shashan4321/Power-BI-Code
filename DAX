@@ -1,0 +1,413 @@
+* POWER BI *
+
+DAX (DATA EXPRESSION ANALYSIS ) 
+
+1. SCM DASHBOARD :- 
+----------------------------
+
+OPENING VALUE = Opening Balance = CALCULATE(SUM(Append_Ineventory[POSTEDVALUE]),FILTER(ALL('Financial Calender'),'Financial Calender'[Date]<MIN('Financial Calender'[Date])))
+
+FIRST DATE=First date = FIRSTDATE(ALL('Financial Calender'[Date]))
+LAST DATE= LASTDATE('Financial Calender'[Date])
+
+CLOSING STOCK= CALCULATE(SUM('Append_Ineventory'[Quantity]),DATESBETWEEN('Financial Calender'[Date],[First date],[Last Date]))
+
+Defective Unit = CALCULATE(COUNT(FNF_PurchaseRegister[DocumentNo]),FILTER(FNF_PurchaseRegister,LEFT(FNF_PurchaseRegister[DocumentNo],2)="DN"))
+
+COUNT=CALCULATE(COUNT(FNF_PurchaseRegister[DocumentNo])
+
+DISTINCT COUNT=CALCULATE(DISTINCTCOUNT(FNF_PurchaseRegister[DocumentNo])
+
+Day pass = DATEDIFF(FNF_TrackingSalesOrder[SO DATE],NOW(),DAY)
+
+Day Pas = CALCULATE(AVERAGE(FNF_GRNHistoryView[Day Pass]))
+
+Day pas LY = CALCULATE([Day Pas],SAMEPERIODLASTYEAR('Financial Calender'[Date]))
+
+ItemsafterLeadTime = CALCULATE(
+    COUNTROWS(FNF_GRNHistoryView),FILTER(
+        FNF_GRNHistoryView,
+        DATEDIFF(FNF_GRNHistoryView[ORDERDATE], FNF_GRNHistoryView[Receipt Date], DAY) > MEDIAN('Appended Stock'[LEAD TIME])
+    )
+)
+
+ItemsWithinLeadTime = CALCULATE(
+    COUNTROWS(FNF_GRNHistoryView),FILTER(
+        FNF_GRNHistoryView,
+        DATEDIFF(FNF_GRNHistoryView[ORDERDATE], FNF_GRNHistoryView[Receipt Date], DAY) <= MEDIAN('Appended Stock'[LEAD TIME])
+    )
+)
+
+Dispachted_N+1_Day = CALCULATE(COUNTROWS(FILTER('Append(I$G)SALES','Append(I$G)SALES'[time to fulfill]=1)))
+
+Dispacted_N+2_Day = CALCULATE(COUNTROWS(FILTER('Append(I$G)SALES','Append(I$G)SALES'[time to fulfill]=2)))
+
+Dispatched_N>2_Day = CALCULATE(COUNTROWS(FILTER('Append(I$G)SALES','Append(I$G)SALES'[time to fulfill]>2)))
+
+Dispatched_sameday = CALCULATE(COUNTROWS(FILTER('Append(I$G)SALES','Append(I$G)SALES'[time to fulfill]=0)))
+
+time to fulfill order = CALCULATE(DATEDIFF(MIN('Append(I$G)SALES'[ORDERDATE]),MIN('Append(I$G)SALES'[POSTINGDATE]),DAY))
+
+Active Duration = DATEDIFF(MIN('Append(I$G)SALES'[POSTINGDATE]),NOW(),MONTH)
+
+Onhand qty = CALCULATE(SUM(FNF_ONHANDVIEW[ONHANDQTY]),REMOVEFILTERS('Financial Calender'[Year]),REMOVEFILTERS('Financial Calender'[Month name]),REMOVEFILTERS('Append(I$G)SALES'[SALESDISTRICTID]),REMOVEFILTERS('Append(I$G)SALES'[CUSTGROUP]),REMOVEFILTERS('Append(I$G)SALES'[NAME]))
+
+No.of Days = CALCULATE(DATEDIFF([Received date],[Start Date],DAY),USERELATIONSHIP('Financial Calender'[Date],'Append(I&G)'[StartDate]))
+
+DATE DIFFERENCE = DATEDIFF([Received date],[Start Date],DAY)
+
+Keepit QTY = CALCULATE(SUM(FNF_GRNHistoryView[QTY]),DATESBETWEEN('Financial Calender'[Date],MIN(FNF_GRNHistoryView[Receipt Date]),MAX('Append(I&G)'[StartDate])))
+
+Keepit Value = CALCULATE(SUM(FNF_GRNHistoryView[VALUEMST]),DATESBETWEEN('Financial Calender'[Date],MIN(FNF_GRNHistoryView[Receipt Date]),MAX('Append(I&G)'[StartDate])))
+
+DATESBETWEEN = DATESBETWEEN(DATE , START DATE , END DATE )
+
+InVOICE-Salesorder = CALCULATE(DISTINCTCOUNT('Appended(I$G)'[ACTUALDOCUMENTNO]),'Appended(I$G)'[ORDERDATE]='Appended(I$G)'[POSTINGDATE])
+
+Pending In-SO = CALCULATE(DISTINCTCOUNT('Appended(I$G)'[ACTUALDOCUMENTNO]),'Appended(I$G)'[ORDERDATE]<>'Appended(I$G)'[POSTINGDATE])
+
+
+
+
+
+
+
+
+
+
+
+2.SALES DASHBOARD....--------
+
+
+Total sales value = CALCULATE(SUM('Append(I&G)'[LINEAMOUNT])
+
+Sales LY = CALCULATE([Total sales value],SAMEPERIODLASTYEAR('Financial year'[Date]))
+
+Sales LY Diff = CALCULATE([Total sales value]-[Sales LY])
+
+Sales LY DIff% = CALCULATE([Sales LY Diff]/[Sales LY])
+
+Sales Degrow.aga.LY- = CALCULATE(IF([Sales LY DIff%]<=0,[Sales LY DIff%]))
+
+Sales Grow.Aga LY+ = CALCULATE(IF([Sales LY DIff%]>0,[Sales LY DIff%]))
+
+Total Sale QTY(FFG) = CALCULATE(SUM(ACX_SALESREGISTER_FFG[QUANTITY]))
+
+QTY LY = CALCULATE([Total sale QTY],SAMEPERIODLASTYEAR('Financial Calender'[Date]))
+
+QTY Grow+ = CALCULATE(IF([QTY Diff %]>0,[QTY Diff %]))
+
+QTY Diff % = CALCULATE([QTY DIFF]/[QTY LY])
+
+QTY Grow+ = CALCULATE(IF([QTY Diff %]>0,[QTY Diff %]))
+
+QTY Degrow- = CALCULATE(IF([QTY Diff %]<=0,[QTY Diff %]))
+
+ASP = CALCULATE([Total sales value]/[Total sale QTY])
+
+Liquidation = CALCULATE([Total sale QTY]/[Inhand qty])
+
+Inv. Count = CALCULATE(DISTINCTCOUNT('Append(I&G)'[ACTUALDOCUMENTNO]),FILTER('Append(I&G)',LEFT('Append(I&G)'[ACTUALDOCUMENTNO],1)="I"))
+
+Inv.Count LY = CALCULATE([Inv. Count],SAMEPERIODLASTYEAR('Financial year'[Date]))
+
+New Customer Count. = 
+ var currentcustomers=VALUES('Append(I&G)'[SOURCENAME])
+ var currentdate=MIN('Financial year'[Date])
+ var pastcustomers=CALCULATETABLE(VALUES('Append(I&G)'[SOURCENAME]),
+    ALL('Financial year'[Date]),'Financial year'[Date]<currentdate)
+ var newcustomers=EXCEPT(currentcustomers,pastcustomers)
+ RETURN
+ COUNTROWS(newcustomers)
+
+
+New Customer QTY Sale. = 
+ var currentcustomers=VALUES('Append(I&G)'[SOURCENAME])
+ var currentdate=MIN('Financial year'[Date])
+ var pastcustomers=CALCULATETABLE(VALUES('Append(I&G)'[SOURCENAME]),
+    ALL('Financial year'[Date]),'Financial year'[Date]<currentdate)
+ var newcustomers=EXCEPT(currentcustomers,pastcustomers)
+ RETURN
+    SUMX(newcustomers,CALCULATE(SUM('Append(I&G)'[QUANTITY])))
+
+
+New Customer Sale value. = 
+ var currentcustomers=VALUES('Append(I&G)'[SOURCENAME])
+ var currentdate=MIN('Financial year'[Date])
+ var pastcustomers=CALCULATETABLE(VALUES('Append(I&G)'[SOURCENAME]),
+    ALL('Financial year'[Date]),'Financial year'[Date]<currentdate)
+ var newcustomers=EXCEPT(currentcustomers,pastcustomers)
+ RETURN
+    SUMX(newcustomers,CALCULATE(SUM('Append(I&G)'[LINEAMOUNT])))
+
+New customer value LY = CALCULATE([New Customer Sale value.],SAMEPERIODLASTYEAR('Financial year'[Date]))
+
+CustomerStatusMeasure(New ,Repeat,Lost Customer) = 
+VAR FirstPurchaseDate = CALCULATE(
+    MIN('Append(I&G)'[POSTINGDATE]),
+    REMOVEFILTERS('Financial year'[Year]),
+    REMOVEFILTERS('Financial year'[Month Name]),
+    REMOVEFILTERS('Financial year'[Day])
+)
+
+VAR LastPurchaseDate = CALCULATE(
+    MAX('Append(I&G)'[POSTINGDATE])
+)
+
+VAR CurrentFiscalYearStart = MIN('Financial year'[Fiscalyearstartdate])
+VAR CurrentFiscalYearEnd = MAX('Financial year'[Fiscalyearenddate])
+
+RETURN
+IF(
+    FirstPurchaseDate >= CurrentFiscalYearStart && FirstPurchaseDate <= CurrentFiscalYearEnd,
+    "New Customer", 
+    IF(
+        LastPurchaseDate >= CurrentFiscalYearStart && LastPurchaseDate <= CurrentFiscalYearEnd,
+        "Repeat Customer", 
+        "Lost Customer"
+    )
+)
+
+Lost Count = CALCULATE(COUNTROWS(FILTER(ALL('Append(I&G)'[SOURCENAME]),AND(AND(OR([QTY LY]>0,[QTY LY]<0),[Total sale QTY]=0),[Sales LY]>1000))))
+
+Lost Count LY = CALCULATE([Lost Count],SAMEPERIODLASTYEAR('Financial year'[Date]))
+
+Lost Cust.Value = CALCULATE([Sale LY],FILTER(ALL('Append(I&G)'[SOURCENAME]),AND(OR([QTY LY]>0,[QTY LY]<0),[Total sale QTY]=0)))
+
+Lost custgrow/degrow = [Lost Count]/CALCULATE([Degrow count]+[Current Customers Count.])
+
+Lost custgrow/degrow LY = CALCULATE([Lost custgrow/degrow],SAMEPERIODLASTYEAR('Financial year'[Date]))
+
+Lostvalue diff% = [Lost Cust.Value]/CALCULATE([Degrowth Diff]+[Current Customer Sales value.])
+
+Lostvalue diff% LY = CALCULATE([Lostvalue diff%],SAMEPERIODLASTYEAR('Financial year'[Date]))
+
+Growth Count = CALCULATE(COUNTROWS(FILTER(ALL('Append(I&G)'[SOURCENAME]),[Quant.LY Diff%]>0)))
+
+Growth Cust.QTY = CALCULATE(SUM('Append(I&G)'[QUANTITY]),FILTER(ALL('Append(I&G)'[SOURCENAME]),[Quant.LY Diff%]>0))
+
+Growth Cust.Value = CALCULATE(SUM('Append(I&G)'[LINEAMOUNT]),FILTER(ALL('Append(I&G)'[SOURCENAME]),[Quant.LY Diff%]>0))
+
+Current Customers Count. = CALCULATE([Total no.of customers]-[New Customer Count.])
+
+DeGrowth including lost = CALCULATE(COUNTROWS(FILTER(ALL('Append(I&G)'[SOURCENAME]),[Quant.LY Diff%]<0)))
+
+Degrow count = CALCULATE([DeGrowth including lost]-[Lost Count])
+
+Degrowth Count grow/degrow% = [Degrow count]/(CALCULATE([DeGrowth including lost]+[Current Customers Count.]))
+
+Degrowth Diff = CALCULATE([Degrowth sale value LY]-[DeGrowth Cust.value])-[Lost Cust.Value]
+
+Degrowth LY = [Degrowth LY Diff]/CALCULATE([Degrowth LY Diff]+[Current customer value LY]+[Lost cust value LY])
+
+Degrowth LY Diff = CALCULATE([Degrowth LYY]-[Degrowth cust value LY])-[Lost cust value LY]
+
+Degrowth% = [Degrowth Diff]/CALCULATE([Degrowth Diff]+[Current Customer Sales value.]+[Lost Cust.Value])
+
+New cust Value grow/degrow = [New Customer Sale value.]/CALCULATE([Current Customer Sales value.]+[Degrowth Diff]+[Lost Cust.Value])
+
+New cust Value grow/degrow LY = CALCULATE([New cust Value grow/degrow],SAMEPERIODLASTYEAR('Financial year'[Date]))
+
+New custgrow/degrow = [New Customer Count.]/CALCULATE([Degrow count]+[Lost Count]+[Current Customers Count.])
+
+New custgrow/degrow LY = CALCULATE([New custgrow/degrow],SAMEPERIODLASTYEAR('Financial year'[Date]))
+
+Curr value Grow/derow = CALCULATE([Current Customer Sales value.]-[Current customer value LY])/[Current customer value LY]
+
+Curr.Cust grow/degrow% = CALCULATE([Current Customers Count.]-[Current Cust.LY])/[Current Cust.LY]
+
+Current Customer Sales value. = CALCULATE([Total sales value]-[New Customer Sale value.])
+
+ACH % = CALCULATE([Total sales exclude(f$C,sam.oth)])/CALCULATE(SUM('IC TARGET'[TARGET]),USERELATIONSHIP('Financial Calender'[Monthname],'IC TARGET'[MONTHNAME]))
+
+SM Dis Inc.amount = CALCULATE(IF([Store ACH %]>=.9,IF(AND([DISC  Inc.]>=9,[DISC  Inc.]<10),3000,IF(AND([DISC  Inc.]>=10,[DISC  Inc.]<11),2000,IF(AND([DISC  Inc.]>=11,[DISC  Inc.]<12),1000,0))),0),FILTER('Store Location(Mapp )','Store Location(Mapp )'[Store Location] IN{"CONCEPT STORE","FF-DLF","FF-PC","FF-KN","WORLDM","FF-GT"}))+CALCULATE(IF([Store ACH %]>=.9,IF(AND([DISC  Inc.]>=9,[DISC  Inc.]<11),3000,IF(AND([DISC  Inc.]>=11,[DISC  Inc.]<13),2000,IF(AND([DISC  Inc.]>=13,[DISC  Inc.]<15),1000,0))),0),FILTER('Store Location(Mapp )','Store Location(Mapp )'[Store Location] IN{"AT-HOME"}))
+
+DISC  Inc. = CALCULATE(CALCULATE(CALCULATE([DISC TY],ACX_SALESREGISTER_FFG[ITEMFAMILYCODE]<>"STAGNANT"&&ACX_SALESREGISTER_FFG[ITEMFAMILYCODE]<>"DISCONTINUED"&&ACX_SALESREGISTER_FFG[ITEMFAMILYCODE]<>"LIMITED"&&ACX_SALESREGISTER_FFG[ITEMFAMILYCODE]<>"BLOCKED"),ACX_SALESREGISTER_FFG[ITEMGROUPID] IN{"FABRIC AD","FABRIC FF","FABRIC DIV","FABRICS","LEATHERETT","BLIND","RODS","RUGS","WALLCOVER"}),ACX_SALESREGISTER_FFG[BRANDCODE] IN {"F&F","DIVINE PLUS","DIVINE"})
+
+DISC TY = AVERAGE(ACX_SALESREGISTER_FFG[LINEDISCOUNTPERCENTAGE])
+
+Linen = IF(CALCULATE([Total sales exclude(f$C,sam.oth)],'Categories Mapping'[Categoriesmap.]="LINEN")>=CALCULATE([Cate.Target],'Cate Target'[CATEGORIES ]="LINEN"),1500,0)
+
+Walk-in = CALCULATE(SUM(FNF_EMPLOYEEWINLOSS[TOTAL]),REMOVEFILTERS(ACX_SALESREGISTER_FFG[NAME]))
+
+Limited Scheme = CALCULATE(IF([ACH %]>=.9,CALCULATE([Total sales exclude(f$C,sam.oth)]*.02,ACX_SALESREGISTER_FFG[ITEMFAMILYCODE] IN{"STAGNANT","BLOCKED","DISCONTINUED","LIMITED"},ACX_SALESREGISTER_FFG[ITEMGROUPID] IN{"FABRIC AD","FABRIC FF","FABRIC DIV","FABRICS","LEATHERETT"})),FILTER(ACX_SALESREGISTER_FFG,NOT ACX_SALESREGISTER_FFG[NAME] IN {"DEEPAK SINGH-DLF","ANKUSH KAPOOR","ROSHAN SINGH","VINOD KUMAR THAKUR","SAGAR ANAND","DEEPAK SINGH"}))
+
+Mattress inc = CALCULATE(IF([ACH %]>=.9,CALCULATE(SUM(ACX_SALESREGISTER_FFG[QUANTITY])*1500,ACX_SALESREGISTER_FFG[CATEGORYCODE]="MATTRESS",FILTER(ACX_SALESREGISTER_FFG,ACX_SALESREGISTER_FFG[BRANDCODE] IN{"SNOOZER"}))+CALCULATE(SUM(ACX_SALESREGISTER_FFG[QUANTITY])*1000,ACX_SALESREGISTER_FFG[CATEGORYCODE]="MATTRESS",FILTER(ACX_SALESREGISTER_FFG,NOT ACX_SALESREGISTER_FFG[BRANDCODE] IN{"SNOOZER"}))))
+
+
+ATV Inc. Amount = 
+    VAR BaseSales = SUM(Target[ATV TAR])
+    VAR LowerThreshold = BaseSales * 1.08
+    VAR MiddleThreshold = BaseSales * 1.10
+    VAR UpperThreshold = BaseSales * 1.13
+    RETURN 
+        IF (
+            AND (
+                [ATV] >= LowerThreshold,
+                [ATV] <= MiddleThreshold
+            ),
+            1000,
+            IF (
+            AND (
+                [ATV] > MiddleThreshold,
+                [ATV] <= UpperThreshold
+            ),
+            1500,
+            IF (
+                [ATV] > UpperThreshold
+            ,
+            2000,0
+        )))
+        
+
+
+Billed Cust. = CALCULATE(DISTINCTCOUNT(ACX_SALESREGISTER_FFG[SOURCENAME]))
+
+Con Rating = CALCULATE(IF(ISBLANK([Con%]),BLANK(),IF([Con%]<.6,"2",IF(AND([Con%]>=.6,[Con%]<.7),"4",IF(AND([Con%]>=.7,[Con%]<.8),"6",IF(AND([Con%]>=.8,[Con%]<.9),"8",IF([Con%]>=.9,"10")))))),NOT ACX_SALESREGISTER_FFG[NAME] IN {"DEEPAK SINGH-DLF", "ANKUSH KAPOOR","ROSHAN SINGH","SAGAR ANAND","VINOD KUMAR THAKUR","DEEPAK SINGH","SIMARPREET KAUR SIDHU"})
+
+
+
+
+
+
+
+
+
+
+3. CATEGORIES DASHBOARD...--------
+
+
+Statement = IF(AND([Total sale QTY]>=([QTY LY]*1.2),[Total sale QTY]<([QTY LY]*1.25)),"GOOD",IF(AND([Total sale QTY]>=([QTY LY]*1.25),[Total sale QTY]<([QTY LY]*1.3)),"EXCELLENT",IF([Total sale QTY]>=([QTY LY]*1.3),"Outstanding",IF(AND([Total sale Value]>=([Sale LY]*1.25),[Total sale Value]<([Sale LY]*1.3)),"GOOD",IF(AND([Total sale Value]>=([Sale LY]*1.3),[Total sale Value]<([Sale LY]*1.35)),"EXCELLENT",IF([Total sale Value]>=([Sale LY]*1.35),"Outstanding","POOR"))))))
+
+
+GP TY% = CALCULATE([Total sale Value]+[Total Cost])/[Total sale Value]
+
+GP LY% = CALCULATE([GP TY%],SAMEPERIODLASTYEAR('Financial Calender'[Date]))
+
+ACTIVE Duration = DATEDIFF(MIN('Appended(I$G)'[POSTINGDATE]),MAX('Appended(I$G)'[POSTINGDATE]),MONTH)
+
+Active Mo. sales = CALCULATE([Total sale Value]/[ACTIVE Duration])
+
+Active Duration = DATEDIFF(MIN('Appended(I$G)'[POSTINGDATE]),ENDOFYEAR('Financial Calender'[Fiscalyearenddate]),MONTH)
+
+Fiscalyearstartdate = DATE(YEAR('Financial Calender'[Date])-IF(MONTH('Financial Calender'[Date])<4,1,0),4,1)
+
+Fiscalyearenddate = EOMONTH('Financial Calender'[Fiscalyearstartdate],11)
+
+Future Date = IF('Financial Calender'[Date]>'Financial Calender'[Current Date],"Future","YTD")
+
+Financial Calender = CALENDARAUTO(3)
+
+Year = YEAR(EDATE('Financial Calender'[Date],-3))
+
+Month = MONTH(EDATE('Financial Calender'[Date],-3))
+
+Month name = FORMAT('Financial Calender'[Date],"mmmm")
+
+QTR = QUARTER(EDATE('Financial Calender'[Date],-3))
+
+DAY = DAY(EDATE('Financial Calender'[Date],-3))
+
+Current Date = NOW()-1
+
+WEEK = WEEKNUM(EDATE('Financial Calender'[Date],-3))
+
+ASP = CALCULATE([Total sale Value]/[Total sale QTY])
+
+ASP Growth = CALCULATE([ASP TY]-[ASP LY])/[ASP LY]
+
+ATV = CALCULATE([Total sales exclude(f$C,sam.oth)])/[Customer Count]
+
+ATV LY = CALCULATE([ATV],SAMEPERIODLASTYEAR('Financial Calender'[Date]))
+
+Coll.Proj.Stock Turn = CALCULATE([New Collection Sales QTY.]/[Current Duration])*12/[CLOSING STOCK]
+
+Proj.Stock Turn = CALCULATE([New SKU Sales QTY.]/[Current Duration])*12/[CLOSING STOCK]
+
+Coll.Proj.Sales = CALCULATE([New Collection Sales QTY.]/[Current Duration])*12
+
+Product_Status (New,Repeat,Lost Product)= 
+VAR FirstPurchaseDate = CALCULATE(
+    MIN('Append(I&G)'[POSTINGDATE]),
+    REMOVEFILTERS('Financial year'[Year]),
+    REMOVEFILTERS('Financial year'[Month Name]),
+    REMOVEFILTERS('Financial year'[Day]),
+    REMOVEFILTERS('Append(I&G)'[SOURCENAME])
+)
+
+VAR LastPurchaseDate = CALCULATE(
+    MAX('Append(I&G)'[POSTINGDATE])
+)
+
+VAR CurrentFiscalYearStart = MIN('Financial year'[Fiscalyearstartdate])
+VAR CurrentFiscalYearEnd = MAX('Financial year'[Fiscalyearenddate])
+
+RETURN
+IF(
+    FirstPurchaseDate >= CurrentFiscalYearStart && FirstPurchaseDate <= CurrentFiscalYearEnd,
+    "New Product", 
+    IF(
+        LastPurchaseDate >= CurrentFiscalYearStart && LastPurchaseDate <= CurrentFiscalYearEnd,
+        "Repeat Product", 
+        "Lost Product"
+    )
+)
+
+
+4.Financial Dashboard.....-------
+---------------
+
+
+GP(Gross Profit) value=calculate(total sales value -product cost)
+
+GP(Gross Profit) percentage=calculate(total sales value -product cost)/total sales value
+
+NP(Net profit) value=calculate(	GP-total expenses-provision)
+
+Net Profit = VAR Prov=IF(ISFILTERED('APPENDED(I&G) Account'[FINANCIALLOCATION]),0,[Provision])
+RETURN
+CALCULATE([Gp]-[Total Expenses(P$L)]-Provision)
+
+
+OR
+NET PROFIT (NP)
+
+Particulars	   Amount (₹)	Explanation
+Revenue (Sales)        	₹1,00,000	Total income from selling goods/services.
+Cost of Goods Sold      ₹40,000	Costs directly related to production (e.g., materials, labor).
+Gross Profit	        ₹60,000	 (₹1,00,000 - ₹40,000 = ₹60,000.)
+Operating Expenses	₹20,000	Other business costs like rent, salaries, etc.
+EBITDA	                ₹40,000	(₹60,000 - ₹20,000 = ₹40,000.)
+Depreciation	        ₹5,000	Non-cash expense for asset value reduction.
+Amortization	        ₹2,000	Non-cash expense for intangible assets.
+Interest	        ₹3,000	Cost of loans and debt.
+Taxes	                ₹7,000	Government taxes.
+Net Profit	        ₹23,000	(₹40,000 - ₹5,000 - ₹2,000 - ₹3,000 - ₹7,000.)
+
+
+Net Profit percentage=calculate(NP/Total sales value)
+
+EBITA(Earning before interest and tax) Value= Calculate(NP + Financial expenses interest + Depriciation)
+
+EBITA Value = VAR DEP=IF(ISFILTERED('APPENDED(I&G) Account'[FINANCIALLOCATION]),0,[Depr.])
+RETURN
+CALCULATE([Net Profit]+[Fin.Expenses Interest]+DEP)
+
+EBITA Percentage=calculate(EBITA/Total sales value)
+
+BALA.DC PL = IF(AND('APPENDED(I&G) Account'[MAINACCOUNTTYPE]=2,'APPENDED(I&G) Account'[TYPE]=1),'APPENDED(I&G) Account'[BALA.DC]*1,IF(AND('APPENDED(I&G) Account'[MAINACCOUNTTYPE]=2,'APPENDED(I&G) Account'[TYPE]=2),'APPENDED(I&G) Account'[BALA.DC]*-1))+IF(AND('APPENDED(I&G) Account'[MAINACCOUNTTYPE]=1,'APPENDED(I&G) Account'[TYPE]=1),'APPENDED(I&G) Account'[BALA.DC]*1,IF(AND('APPENDED(I&G) Account'[MAINACCOUNTTYPE]=1,'APPENDED(I&G) Account'[TYPE]=2),'APPENDED(I&G) Account'[BALA.DC]*1))+IF(AND('APPENDED(I&G) Account'[MAINACCOUNTTYPE]=4,'APPENDED(I&G) Account'[TYPE]=1),'APPENDED(I&G) Account'[BALA.DC]*1,IF(AND('APPENDED(I&G) Account'[MAINACCOUNTTYPE]=4,'APPENDED(I&G) Account'[TYPE]=0),'APPENDED(I&G) Account'[BALA.DC]*1,IF(AND('APPENDED(I&G) Account'[MAINACCOUNTTYPE]=4,'APPENDED(I&G) Account'[TYPE]=2),'APPENDED(I&G) Account'[BALA.DC]*-1))+IF(AND('APPENDED(I&G) Account'[MAINACCOUNTTYPE]=5,'APPENDED(I&G) Account'[TYPE]=1),'APPENDED(I&G) Account'[BALA.DC]*-1,IF(AND('APPENDED(I&G) Account'[MAINACCOUNTTYPE]=5,'APPENDED(I&G) Account'[TYPE]=0),'APPENDED(I&G) Account'[BALA.DC]*-1,IF(AND('APPENDED(I&G) Account'[MAINACCOUNTTYPE]=5,'APPENDED(I&G) Account'[TYPE]=2),'APPENDED(I&G) Account'[BALA.DC]*1))+IF(AND('APPENDED(I&G) Account'[MAINACCOUNTTYPE]=0,'APPENDED(I&G) Account'[TYPE]=1),'APPENDED(I&G) Account'[BALA.DC]*1,IF(AND('APPENDED(I&G) Account'[MAINACCOUNTTYPE]=0,'APPENDED(I&G) Account'[TYPE]=2),'APPENDED(I&G) Account'[BALA.DC]*1))))
+
+
+Dynamic Next Date or Month = 
+VAR MaxDate = MAX('Financial Calendar'[Date])  -- Get the maximum selected date in the filter
+VAR MaxMonth = MONTH(MaxDate)  -- Extract the month from the maximum date
+VAR MaxYear = YEAR(MaxDate)  -- Extract the year from the maximum date
+VAR IsDateSelected = NOT(ISBLANK(MaxDate))  -- Check if the selection is a specific date
+VAR Next= MaxDate + 1  -- Calculate the next day
+VAR NextMonthStart = DATE(MaxYear, MaxMonth + 1, 1)  -- Calculate the first date of the next month
+RETURN 
+    IF(IsDateSelected, Next, NextMonthStart)  -- Return the appropriate value based on selection type
+
+
+Days Difference = 
+    DATEDIFF(MIN(FNF_VENDORLEDGER[DOCUMENTDATE]), [Dynamic Next Date or Month], DAY)
