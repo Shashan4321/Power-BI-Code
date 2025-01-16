@@ -76,6 +76,8 @@ Pending In-SO = CALCULATE(DISTINCTCOUNT('Appended(I$G)'[ACTUALDOCUMENTNO]),'Appe
 
 
 
+
+
 2.SALES DASHBOARD....--------
 
 
@@ -265,7 +267,8 @@ Billed Cust. = CALCULATE(DISTINCTCOUNT(ACX_SALESREGISTER_FFG[SOURCENAME]))
 
 Con Rating = CALCULATE(IF(ISBLANK([Con%]),BLANK(),IF([Con%]<.6,"2",IF(AND([Con%]>=.6,[Con%]<.7),"4",IF(AND([Con%]>=.7,[Con%]<.8),"6",IF(AND([Con%]>=.8,[Con%]<.9),"8",IF([Con%]>=.9,"10")))))),NOT ACX_SALESREGISTER_FFG[NAME] IN {"DEEPAK SINGH-DLF", "ANKUSH KAPOOR","ROSHAN SINGH","SAGAR ANAND","VINOD KUMAR THAKUR","DEEPAK SINGH","SIMARPREET KAUR SIDHU"})
 
-
+Total sales (month/quarter/year) wise against average sales with dynamic period 
+Dynamic average = SWITCH(TRUE(),ISINSCOPE('Financial Calender'[Monthname]),AVERAGEX(ALLSELECTED('Financial Calender'[Monthname],'Financial Calender'[Month]),[Total sale value]),ISINSCOPE('Financial Calender'[Quarter]),AVERAGEX(ALLSELECTED('Financial Calender'[Quarter]),[Total sale value]),ISINSCOPE('Financial Calender'[Year]),AVERAGEX(ALLSELECTED('Financial Calender'[Year]),[Total sale value]))
 
 
 
