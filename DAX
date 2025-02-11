@@ -270,7 +270,7 @@ Con Rating = CALCULATE(IF(ISBLANK([Con%]),BLANK(),IF([Con%]<.6,"2",IF(AND([Con%]
 Total sales (month/quarter/year) wise against average sales with dynamic period 
 Dynamic average = SWITCH(TRUE(),ISINSCOPE('Financial Calender'[Monthname]),AVERAGEX(ALLSELECTED('Financial Calender'[Monthname],'Financial Calender'[Month]),[Total sale value]),ISINSCOPE('Financial Calender'[Quarter]),AVERAGEX(ALLSELECTED('Financial Calender'[Quarter]),[Total sale value]),ISINSCOPE('Financial Calender'[Year]),AVERAGEX(ALLSELECTED('Financial Calender'[Year]),[Total sale value]))
 
-
+LastDatePrevMonth = EOMONTH(TODAY(), -1)
 
 
 
